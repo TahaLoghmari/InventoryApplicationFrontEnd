@@ -59,7 +59,7 @@ export default function CreateCategory() {
         description: data.description,
         imageURL: `${data.picture}`,
       };
-      const response = await fetch("/api/categories/add", {
+      const response = await fetch(`${API_BASE_URL}/categories/add`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
