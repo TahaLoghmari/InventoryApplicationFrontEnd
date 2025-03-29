@@ -20,6 +20,7 @@ function App() {
         return response.json();
       })
       .then((categoriesData) => {
+        setLoading(false);
         const formattedCategories = categoriesData
           .map((category) => {
             return {
@@ -31,6 +32,7 @@ function App() {
           })
           .catch((error) => console.log(error));
         setCategoryList(formattedCategories);
+        setLoading(true);
         return fetch(`${API_BASE_URL}/games`)
           .then((response) => response.json())
           .then((gamesData) => {
