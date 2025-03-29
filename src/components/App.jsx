@@ -20,23 +20,18 @@ function App() {
         return response.json();
       })
       .then((categoriesData) => {
-        setLoading(false);
-        const formattedCategories = categoriesData
-          .map((category) => {
-            return {
-              id: category.categoryid,
-              name: category.name,
-              imageUrl: category.imageurl,
-              description: category.description,
-            };
-          })
-          .catch((error) => console.log(error));
+        const formattedCategories = categoriesData.map((category) => {
+          return {
+            id: category.categoryid,
+            name: category.name,
+            imageUrl: category.imageurl,
+            description: category.description,
+          };
+        });
         setCategoryList(formattedCategories);
-        setLoading(true);
         return fetch(`${API_BASE_URL}/games`)
           .then((response) => response.json())
           .then((gamesData) => {
-            setLoading(false);
             const formattedGames = gamesData.map((game) => {
               const matchingCategory = formattedCategories.find(
                 (category) => category.id == game.categoryid
@@ -52,10 +47,12 @@ function App() {
               };
             });
             setGameList(formattedGames);
+            setLoading(false);
           });
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
+        setLoading(false);
       });
   }, []);
   if (loading)
