@@ -17,7 +17,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useContext, useState, useEffect } from "react";
-import { API_BASE_URL } from '@/lib/api';
+import { API_BASE_URL } from "@/lib/api";
 import { States } from "./App";
 import {
   AlertDialog,
@@ -52,6 +52,7 @@ export default function EditCategory() {
   } = useContext(States);
   const Category = CategoryList.find((item) => item.id === parseInt(id));
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -65,6 +66,7 @@ export default function EditCategory() {
   }, []);
   const onSubmit = async (data) => {
     try {
+      setLoading(true);
       console.log(data);
       const categoryData = {
         name: data.name,
@@ -100,6 +102,7 @@ export default function EditCategory() {
         }
         return game;
       });
+      setLoading(false);
       setGameList(updatedGameList);
       setIsDialogOpen(true);
     } catch (error) {
@@ -109,6 +112,15 @@ export default function EditCategory() {
   let goBack = () => {
     navigate("/categories");
   };
+  if (loading)
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+        <div className="bg-card rounded-lg p-6 text-center shadow-lg">
+          <div className="border-primary mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"></div>
+          <p className="text-lg font-medium">Editing Category...</p>
+        </div>
+      </div>
+    );
   return (
     <>
       <Form {...form}>

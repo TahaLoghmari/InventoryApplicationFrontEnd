@@ -14,7 +14,7 @@ import {
   FormDescription,
   FormMessage,
 } from "@/components/ui/form";
-import { API_BASE_URL } from '@/lib/api';
+import { API_BASE_URL } from "@/lib/api";
 import { useContext, useState, useEffect } from "react";
 import { States } from "./App";
 import {
@@ -43,6 +43,7 @@ const formSchema = z.object({
 
 export default function CreateCategory() {
   const { setCategoryList, CategoryList, setCurrentPage } = useContext(States);
+  const [loading, setLoading] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const navigate = useNavigate();
   const form = useForm({
@@ -55,6 +56,7 @@ export default function CreateCategory() {
   }, []);
   const onSubmit = async (data) => {
     try {
+      setLoading(true);
       const categoryData = {
         name: data.name,
         description: data.description,
@@ -81,6 +83,7 @@ export default function CreateCategory() {
           imageUrl: newCategory.imageurl,
         },
       ]);
+      setLoading(false);
       setIsDialogOpen(true);
     } catch (error) {
       console.error("Error creating category:", error);
@@ -90,6 +93,15 @@ export default function CreateCategory() {
   let goBack = () => {
     navigate(-1);
   };
+  if (loading)
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+        <div className="bg-card rounded-lg p-6 text-center shadow-lg">
+          <div className="border-primary mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"></div>
+          <p className="text-lg font-medium">Creating Category...</p>
+        </div>
+      </div>
+    );
   return (
     <>
       <Form {...form}>

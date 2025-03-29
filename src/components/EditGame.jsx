@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { CircleCheck } from "lucide-react";
-import { API_BASE_URL } from '@/lib/api';
+import { API_BASE_URL } from "@/lib/api";
 import {
   Form,
   FormControl,
@@ -57,6 +57,7 @@ export default function EditGame() {
     useContext(States);
   const Game = GameList.find((item) => item.id === parseInt(id));
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -73,6 +74,7 @@ export default function EditGame() {
   }, []);
   const onSubmit = async (data) => {
     try {
+      setLoading(true);
       const categoryId = CategoryList.find(
         (cat) => cat.name === data.category
       )?.id;
@@ -106,6 +108,7 @@ export default function EditGame() {
         platform: data.platform,
         imageUrl: gameData.imageURL,
       };
+      setLoading(false);
       setGameList(updatedGameList);
       setIsDialogOpen(true);
     } catch (error) {
@@ -115,6 +118,15 @@ export default function EditGame() {
   let goBack = () => {
     navigate(-1);
   };
+  if (loading)
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+        <div className="bg-card rounded-lg p-6 text-center shadow-lg">
+          <div className="border-primary mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"></div>
+          <p className="text-lg font-medium">Editing Game...</p>
+        </div>
+      </div>
+    );
   return (
     <>
       <Form {...form}>

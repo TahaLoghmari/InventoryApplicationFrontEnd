@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { States } from "./App";
 import { toast } from "sonner";
-import { API_BASE_URL } from '@/lib/api';
+import { API_BASE_URL } from "@/lib/api";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,9 +17,11 @@ export default function DeleteGame() {
   const { GameList, setGameList } = useContext(States);
   const { id } = useParams();
   const [isOpen, setIsOpen] = useState(true);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const handleDelete = async () => {
     try {
+      setLoading(true);
       const response = await fetch(`${API_BASE_URL}/games/${id}`, {
         method: "DELETE",
       });
@@ -31,6 +33,7 @@ export default function DeleteGame() {
       );
       setGameList(updatedGameList);
       setIsOpen(false);
+      setLoading(false);
       toast("Game has been deleted successfully.");
       navigate("/games");
     } catch (error) {
@@ -42,6 +45,15 @@ export default function DeleteGame() {
     setIsOpen(false);
     navigate("/games");
   };
+  if (loading)
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+        <div className="bg-card rounded-lg p-6 text-center shadow-lg">
+          <div className="border-primary mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"></div>
+          <p className="text-lg font-medium">Deleting Game...</p>
+        </div>
+      </div>
+    );
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogContent>

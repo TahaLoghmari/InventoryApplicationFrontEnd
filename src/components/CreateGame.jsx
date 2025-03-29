@@ -34,7 +34,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft } from "lucide-react";
-import { API_BASE_URL } from '@/lib/api';
+import { API_BASE_URL } from "@/lib/api";
 
 const formSchema = z.object({
   name: z.string().min(3, "Game name must be at least 3 characters"),
@@ -53,6 +53,7 @@ export default function CreateGame() {
   const navigate = useNavigate();
   const { CategoryList, setGameList, setCurrentPage } = useContext(States);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -69,6 +70,7 @@ export default function CreateGame() {
   }, []);
   const onSubmit = async (data) => {
     try {
+      setLoading(true);
       const categoryId = CategoryList.find(
         (cat) => cat.name === data.category
       )?.id;
@@ -103,6 +105,7 @@ export default function CreateGame() {
           category: data.category,
         },
       ]);
+      setLoading(false);
       setIsDialogOpen(true);
     } catch (error) {
       console.error("Error creating game:", error);
@@ -112,6 +115,15 @@ export default function CreateGame() {
   let goBack = () => {
     navigate(-1);
   };
+  if (loading)
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+        <div className="bg-card rounded-lg p-6 text-center shadow-lg">
+          <div className="border-primary mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"></div>
+          <p className="text-lg font-medium">Creating Game...</p>
+        </div>
+      </div>
+    );
   return (
     <>
       <Form {...form}>

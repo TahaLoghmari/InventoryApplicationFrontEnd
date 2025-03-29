@@ -3,14 +3,16 @@ import { ModeToggle } from "./mode-toggle";
 import { createContext, useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import NavBar from "./NavBar";
-import { API_BASE_URL } from '@/lib/api';
+import { API_BASE_URL } from "@/lib/api";
 
 export const States = createContext(null);
 function App() {
   const [currentPage, setCurrentPage] = useState("GameStore");
   const [GameList, setGameList] = useState([]);
   const [CategoryList, setCategoryList] = useState([]);
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
+    setLoading(true);
     setCurrentPage("Games");
     fetch(`${API_BASE_URL}/categories`)
       .then((response) => {
@@ -18,18 +20,21 @@ function App() {
         return response.json();
       })
       .then((categoriesData) => {
-        const formattedCategories = categoriesData.map((category) => {
-          return {
-            id: category.categoryid,
-            name: category.name,
-            imageUrl: category.imageurl,
-            description: category.description,
-          };
-        });
+        const formattedCategories = categoriesData
+          .map((category) => {
+            return {
+              id: category.categoryid,
+              name: category.name,
+              imageUrl: category.imageurl,
+              description: category.description,
+            };
+          })
+          .catch((error) => console.log(error));
         setCategoryList(formattedCategories);
         return fetch(`${API_BASE_URL}/games`)
           .then((response) => response.json())
           .then((gamesData) => {
+            setLoading(false);
             const formattedGames = gamesData.map((game) => {
               const matchingCategory = formattedCategories.find(
                 (category) => category.id == game.categoryid
@@ -51,6 +56,15 @@ function App() {
         console.error("Error fetching data:", error);
       });
   }, []);
+  if (loading)
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+        <div className="bg-card rounded-lg p-6 text-center shadow-lg">
+          <div className="border-primary mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"></div>
+          <p className="text-lg font-medium">Loading...</p>
+        </div>
+      </div>
+    );
   return (
     <ThemeProvider>
       <States.Provider

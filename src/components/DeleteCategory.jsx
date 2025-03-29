@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { States } from "./App";
-import { API_BASE_URL } from '@/lib/api';
+import { API_BASE_URL } from "@/lib/api";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,9 +17,11 @@ export default function DeleteCategory() {
   const { id } = useParams();
   const [isOpen, setIsOpen] = useState(true);
   const [errorDialogOpen, setErrorDialogOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const handleDelete = async () => {
     try {
+      setLoading(true);
       const response = await fetch(`${API_BASE_URL}/categories/${id}`, {
         method: "DELETE",
       });
@@ -32,6 +34,7 @@ export default function DeleteCategory() {
       setCategoryList(updatedCategoryList);
       setIsOpen(false);
       navigate("/categories");
+      setLoading(false);
     } catch (error) {
       setErrorDialogOpen(true);
     }
@@ -40,6 +43,15 @@ export default function DeleteCategory() {
     setIsOpen(false);
     navigate("/categories");
   };
+  if (loading)
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+        <div className="bg-card rounded-lg p-6 text-center shadow-lg">
+          <div className="border-primary mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"></div>
+          <p className="text-lg font-medium">Deleting Category...</p>
+        </div>
+      </div>
+    );
   return (
     <>
       <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
